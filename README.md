@@ -10,7 +10,21 @@ Shadchen provides basic matching support for Scheme data structures and is _exte
 Example Usage
 -------------
 
-    (match 'x       (('x 'matched-literal-x)))      (define (reverse3 seq)       (match seq 		 ((list a b c) (list c b a))          ((vector a b c) (list c b a))))      ;; or equivalently:        (define (reverse3 seq)       (match seq 		 ((or (vector a b c) (list a b c)) (list c b a)))) 
+    (match 'x
+     (('x 'matched-literal-x)))      
+    
+    (define (reverse3 seq)       
+     (match seq
+      ((list a b c) (list c b a))
+      ((vector a b c) (list c b a))))      
+
+    ;; or equivalently:        
+
+    (define (reverse3 seq)       
+     (match seq 		 
+      ((or (vector a b c) (list a b c)) (list c b a)))) 
+
+
 Documentation
 -------------
 
