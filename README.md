@@ -113,7 +113,7 @@ Matches ALL of the `sub-patterns` or fails.  Sub patterns do not need to bind th
 
 `(let bindings ...)`
 
-Always succeeds and bindings the implied values/name pairs in bindings, like a let expression.
+Always succeeds and binds the implied values/name pairs in bindings, like a let expression.
 
 eg:
     
