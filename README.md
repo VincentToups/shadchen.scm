@@ -95,5 +95,13 @@ Transforms the value to be matched via function and then matches the patterns.  
 
 `(call* function <pattern1> ...)`
 
-As in `call` except that if function returns `*match-fail*` the match fails.  This allows you to drop out of the pattern matcher and place arbitrary modification and matching.  A common pattern is to transform a match value via a `call*` and detect failure as well.
+As in `call` except that if function returns `*match-fail*` the match fails.  This allows you to drop out of the pattern matcher and place arbitrary modification and matching.  A common pattern is to use `call*` to both detect match failures and transform a value in preparation for subsequent matches.  For instance, we could write a match against `cons` cells like this:
+
+   (define-pattern (cons-cell car-pattern cdr-pattern)
+    `(call* (lambda (object)
+             (if (pair? object) (list (car object) (cdr object))
+                 *match-fail*))
+            (list ,car-pattern ,cdr-pattern)))
+
+
 
