@@ -103,5 +103,11 @@ As in `call` except that if function returns `*match-fail*` the match fails.  Th
                  *match-fail*))
             (list ,car-pattern ,cdr-pattern)))
 
+`(or sub-patterns ...)`
 
+Matches any of the `sub-patterns`.  Given the nature of pattern matching, each sub-pattern must result in the same set of bound values.
+
+`(and sub-patterns)` 
+
+Matches ALL of the `sub-patterns` or fails.  Sub patterns do not need to bind the same symbols (and in general will not).  
 

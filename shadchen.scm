@@ -32,7 +32,7 @@
 ;; Add a custom pattern matcher.  Patterns are similar to macros in
 ;; that they take arguments and must return a pattern expression.
 (define-macro (define-pattern name-and-args #!rest body)
-  `(at-expand-time 
+  `(at-expand-time-and-runtime
 	(add-pattern-matcher ',(car name-and-args)
 						 (lambda ,(cdr name-and-args) ,@body))))
 
@@ -60,6 +60,8 @@
 	   (let ((sigil (car pattern))
 			 (pattern-body (cdr pattern)))
 		 (cond 
+		  ((eq? sigil 'let)
+		   (append acc (map car pattern-body)))
 		  ((eq? sigil 'quote) acc)
 		  ((eq? sigil 'list)
 		   (append acc (list-pattern-bound-symbols pattern-body)))
@@ -76,7 +78,7 @@
 			 (pattern-bound-symbols* `(and ,@patterns) acc)))
 		  (else 
 		   (if (custom-pattern? sigil) 
-			   (pattern-bound-symbols* (expand-custom-matcher sigil) acc)
+			   (pattern-bound-symbols* (apply expand-custom-matcher sigil pattern-body) acc)
 			   (error (string-append " Unrecognized pattern name: " (symbol->string sigil))))))))))
    (pattern-bound-symbols* pattern))
 
@@ -126,6 +128,8 @@
 	(let ((pattern-head (car form))
 		  (pattern-body (cdr form)))
 	  (cond 
+	   ((eq? 'let pattern-head)
+		`(let (,@pattern-body) ,@body))
 	   ((eq? 'quote pattern-head)
 		`(if (equal? ,expr ,form)
 			 (begin ,@body)
@@ -152,10 +156,8 @@
 		   (else (let* ((bound-symbols (pattern-bound-symbols (car terms))))
 				   `(let* ((,value-name ,expr)
 						   (,result-name (match1-or-fail ,value-name ,(car terms) (list ,@bound-symbols))))
-					  (display (list "matching or" ,result-name)) (newline)
 					  (if (eq? *match-fail* ,result-name)
 						  (begin 
-							(display '(match1-or-fail ,value-name (or ,@(cdr terms)) ,@body)) (newline)
 							(match1-or-fail ,value-name (or ,@(cdr terms)) ,@body))
 						  (match1-or-fail ,result-name (list ,@bound-symbols) ,@body))))))))
 	   ((eq? 'list pattern-head)
