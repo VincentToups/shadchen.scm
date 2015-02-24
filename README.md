@@ -105,9 +105,18 @@ As in `call` except that if function returns `*match-fail*` the match fails.  Th
 
 `(or sub-patterns ...)`
 
-Matches any of the `sub-patterns`.  Given the nature of pattern matching, each sub-pattern must result in the same set of bound values.
+Matches any of the `sub-patterns`.  Given the nature of pattern matching, each sub-pattern must result in the same set of bound values.  This is checked statically, and it is a macro-expansion time error to try to `or` with disjoint patterns.
 
 `(and sub-patterns)` 
 
 Matches ALL of the `sub-patterns` or fails.  Sub patterns do not need to bind the same symbols (and in general will not).  
 
+`(let bindings ...)`
+
+Always succeeds and bindings the implied values/name pairs in bindings, like a let expression.
+
+eg:
+    
+    `(match (some-value) ((let (x 10) (y 11)) (list x y)))`
+
+returns `(10 11)`, regardless of what `(some-value)` evaluates to.  A combination of `or` and `let` can allow you to provide default bindings in the case of what would otherwise be a failed match.
