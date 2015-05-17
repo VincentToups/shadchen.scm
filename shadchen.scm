@@ -54,6 +54,8 @@
 			   (symbol->string s2)))
    (define (pattern-bound-symbols* pattern #!optional (acc (list)))
 	 (cond
+	  ((eq? pattern #t) acc)
+	  ((eq? pattern #f) acc)
 	  ((symbol? pattern) (cons pattern acc))
 	  ((or (number? pattern) (keyword? pattern) (string? pattern)) acc)
 	  ((list? pattern)
@@ -85,13 +87,14 @@
  ;; Return #t when S1 and S2, lists of symbols, are set-equivalent.
  (define (sets-equal? s1 s2 #!key (test eq?))
    (define (list->truth-table l)
+	 (pretty-print (list "list->truth-table " l)) (newline)
 	 (let ((tbl (make-table test: test)))
-	   (let loop ((rest l))
+	   (let sets-equal-loop ((rest l))
 		 (if (eq? '() rest)
 			 tbl
 			 (begin (table-set! tbl (car rest) #t)
-					(loop (cdr rest)))))))
-   (define (all-keys-in-table? keys tbl)
+					(sets-equal-loop (cdr rest)))))))
+   (define (all-keys-in-table? keys tbl)	 
 	 (if (eq? '() keys) #t
 		 (let ((key (car keys))
 			   (rest (cdr keys)))
@@ -116,6 +119,8 @@
 ;; the special value *match-fail*.
 (define-macro (match1-or-fail expr form #!rest body)  
   (cond 
+   ((eq? form #t) `(if (eq? ,expr #t) (begin ,@body) *match-fail*))
+   ((eq? form #f) `(if (eq? ,expr #f) (begin ,@body) *match-fail*))
    ((symbol? form)
 	`(let ((,form ,expr)) ,@body))
    ((string? form)

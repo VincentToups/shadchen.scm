@@ -58,4 +58,9 @@
 			 ((or (vector x y) (let (x 10) (y 11)))
 			  (list x y))))
 
-
+(test "false match"
+	  equal?
+	  matched:
+	  (match #f
+			 ((or #f #t)
+			  matched:)))
